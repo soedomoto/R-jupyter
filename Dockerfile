@@ -30,5 +30,6 @@ RUN mkdir -p /workdir
 WORKDIR /workdir
 VOLUME /workdir
 
-#
+# Startup
+EXPOSE 8888
 ENTRYPOINT ["/usr/local/bin/jupyter", "notebook", "--allow-root", "--ip=0.0.0.0"]
