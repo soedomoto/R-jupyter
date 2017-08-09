@@ -27,7 +27,7 @@ RUN Rscript -e "devtools::install_github('IRkernel/IRkernel')"
 RUN Rscript -e "IRkernel::installspec()"
 
 # Install required R packages
-RUN Rscript -e "install.packages(c('sqldf', 'forecast', 'plyr', 'dplyr', 'stringr', 'lubridate', 'ggplot2', 'ggrepel', 'ez', 'qcc', 'reshape', 'reshape2', 'randomForest'), repos='http://cran.r-project.org')"
+RUN Rscript -e "install.packages(c('sqldf', 'forecast', 'plyr', 'dplyr', 'stringr', 'lubridate', 'ggplot2', 'ggrepel', 'ez', 'scales', 'qcc', 'reshape', 'reshape2', 'randomForest'), repos='http://cran.r-project.org')"
 
 # Clean apt cache
 RUN DEBIAN_FRONTEND=noninteractive apt-get clean
