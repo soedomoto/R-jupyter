@@ -3,6 +3,7 @@ MAINTAINER Aris Prawisudatama <soedomoto@gmail.com>
 
 # Change ubuntu mirror
 RUN sed -i "s|http://archive.ubuntu.com/ubuntu/|mirror://mirrors.ubuntu.com/mirrors.txt|g" /etc/apt/sources.list
+# RUN sed -i "s|http://archive.ubuntu.com/ubuntu/|http://jp.archive.ubuntu.com/ubuntu/|g" /etc/apt/sources.list
 RUN apt-get update -y
 
 # Install Python
@@ -37,6 +38,9 @@ RUN mkdir -p /workdir
 WORKDIR /workdir
 VOLUME /workdir
 
+# Copy config
+COPY config.py /config.py
+
 # Startup
 EXPOSE 8888
-ENTRYPOINT ["/usr/local/bin/jupyter", "notebook", "--allow-root", "--ip=0.0.0.0"]
+ENTRYPOINT ["/usr/local/bin/jupyter", "notebook", "--allow-root", "--ip=0.0.0.0", "--config=/config.py"]
