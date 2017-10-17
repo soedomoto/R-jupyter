@@ -21,7 +21,7 @@ RUN git clone -b 3.6.2 --single-branch https://git.osgeo.org/gogs/geos/geos.git
 RUN cd geos && ./autogen.sh && ./configure && make && make install
 RUN rm -R geos
 
-RUN apk add --no-cache lapack lapack-dev \
+RUN apk add --no-cache openblas openblas-dev \
   gfortran \
   freetype freetype-dev \
   libpng libpng-dev \
@@ -45,16 +45,6 @@ RUN pip3 install --upgrade --no-cache-dir https://storage.googleapis.com/tensorf
 RUN pip3 install --upgrade --no-cache-dir theano
 RUN pip3 install --upgrade --no-cache-dir nltk
 RUN pip3 install --upgrade --no-cache-dir gensim
-
-# # Install FFI
-# RUN apk add --no-cache 	libffi libffi-dev
-# # Install SSL
-# RUN apk add --no-cache openssl openssl-dev
-# # Install XML
-# RUN apk add --no-cache libxml2 libxml2-dev
-# # Install XSLT
-# RUN apk add --no-cache libxslt libxslt-dev
-
 RUN pip3 install --upgrade --no-cache-dir scrapy
 RUN pip3 install --upgrade --no-cache-dir cython
 RUN pip3 install --upgrade --no-cache-dir https://github.com/matplotlib/basemap/archive/v1.1.0.tar.gz
@@ -62,9 +52,6 @@ RUN pip3 install --upgrade --no-cache-dir https://github.com/statsmodels/statsmo
 
 # Install R
 RUN apk add --no-cache R R-dev
-
-# # Install CURL
-# RUN apk add --no-cache curl curl-dev
 
 # Install R kernel
 RUN Rscript -e "install.packages(c('repr', 'pbdZMQ', 'devtools'), repos='http://cran.r-project.org')"
