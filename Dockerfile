@@ -1,26 +1,56 @@
-FROM ubuntu:xenial
+FROM alpine:edge
 MAINTAINER Aris Prawisudatama <soedomoto@gmail.com>
 
-# Change ubuntu mirror
-RUN sed -i "s|http://archive.ubuntu.com/ubuntu/|mirror://mirrors.ubuntu.com/mirrors.txt|g" /etc/apt/sources.list
-# RUN sed -i "s|http://archive.ubuntu.com/ubuntu/|http://jp.archive.ubuntu.com/ubuntu/|g" /etc/apt/sources.list
-RUN apt-get update -y
+RUN apk upgrade --update
+
+# Install essential
+RUN apk add --no-cache alpine-sdk libevent-dev bsd-compat-headers git
 
 # Install Python
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y python3 python3-dev python3-pip
+RUN apk add --no-cache python3 python3-dev
+RUN python3 -m ensurepip && rm -r /usr/lib/python*/ensurepip
+RUN pip3 install --upgrade pip setuptools
 
 # Install jupyter
 RUN pip3 install --upgrade jupyter ipyparallel --no-cache-dir
 RUN ipcluster nbextension enable
 
+# Install geos
+RUN apk add --no-cache autoconf automake libtool
+RUN git clone -b 3.6.2 --single-branch https://git.osgeo.org/gogs/geos/geos.git
+RUN cd geos && ./autogen.sh && ./configure && make && make install
+RUN rm -R geos
+
+# Install lapack
+RUN apk add --no-cache lapack lapack-dev gfortran
+
 # Install required python packages
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y libgeos-dev
-RUN pip3 install --upgrade numpy scipy pandas matplotlib seaborn bokeh networkx sklearn keras tensorflow theano nltk gensim scrapy --no-cache-dir
-RUN pip3 install --upgrade cython
-RUN pip3 install --upgrade https://github.com/matplotlib/basemap/archive/v1.1.0.tar.gz https://github.com/statsmodels/statsmodels/archive/v0.8.0.tar.gz --no-cache-dir
+RUN pip3 install --upgrade --no-cache-dir numpy
+RUN pip3 install --upgrade --no-cache-dir scipy
+RUN pip3 install --upgrade --no-cache-dir pandas
+RUN pip3 install --upgrade --no-cache-dir matplotlib
+RUN pip3 install --upgrade --no-cache-dir seaborn
+RUN pip3 install --upgrade --no-cache-dir bokeh
+RUN pip3 install --upgrade --no-cache-dir networkx
+RUN pip3 install --upgrade --no-cache-dir sklearn
+RUN pip3 install --upgrade --no-cache-dir keras
+RUN pip3 install --upgrade --no-cache-dir tensorflow
+RUN pip3 install --upgrade --no-cache-dir theano
+RUN pip3 install --upgrade --no-cache-dir nltk
+RUN pip3 install --upgrade --no-cache-dir gensim
+RUN pip3 install --upgrade --no-cache-dir scrapy
+RUN pip3 install --upgrade --no-cache-dir cython
+RUN pip3 install --upgrade --no-cache-dir https://github.com/matplotlib/basemap/archive/v1.1.0.tar.gz
+RUN pip3 install --upgrade --no-cache-dir https://github.com/statsmodels/statsmodels/archive/v0.8.0.tar.gz
 
 # Install R
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y r-base r-base-dev libssl-dev libcurl3-dev curl
+RUN apk add --no-cache R R-dev
+
+# Install SSL
+RUN apk add --no-cache openssl openssl-dev
+
+# Install CURL
+RUN apk add --no-cache curl curl-dev
 
 # Install R kernel
 RUN Rscript -e "install.packages(c('repr', 'pbdZMQ', 'devtools'), repos='http://cran.r-project.org')"
@@ -30,17 +60,9 @@ RUN Rscript -e "IRkernel::installspec()"
 # Install required R packages
 RUN Rscript -e "install.packages(c('sqldf', 'forecast', 'plyr', 'dplyr', 'stringr', 'lubridate', 'ggplot2', 'ggrepel', 'ez', 'scales', 'qcc', 'reshape', 'reshape2', 'randomForest'), repos='http://cran.r-project.org')"
 
-# Clean apt cache
-RUN DEBIAN_FRONTEND=noninteractive apt-get clean
-
-# Create workdir and expose as volume
-RUN mkdir -p /workdir
-WORKDIR /workdir
-VOLUME /workdir
-
-# Copy config
-COPY config.py /config.py
-
-# Startup
-EXPOSE 8888
-ENTRYPOINT ["/usr/local/bin/jupyter", "notebook", "--allow-root", "--ip=0.0.0.0", "--config=/config.py"]
+# Remove unused
+RUN apk del --purge R-dev openssl-dev curl-dev
+RUN apk del --purge autoconf automake libtool
+RUN apk del --purge geos-dev lapack-dev
+RUN apk del --purge python3-dev
+RUN apk del --purge alpine-sdk libevent-dev bsd-compat-headers git
