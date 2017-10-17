@@ -21,10 +21,9 @@ RUN git clone -b 3.6.2 --single-branch https://git.osgeo.org/gogs/geos/geos.git
 RUN cd geos && ./autogen.sh && ./configure && make && make install
 RUN rm -R geos
 
-# Install lapack
-RUN apk add --no-cache lapack lapack-dev gfortran
-
 # Install required python packages
+RUN apk add --no-cache lapack lapack-dev gfortran freetype freetype-dev libpng libpng-dev
+
 RUN pip3 install --upgrade --no-cache-dir numpy
 RUN pip3 install --upgrade --no-cache-dir scipy
 RUN pip3 install --upgrade --no-cache-dir pandas
@@ -63,6 +62,6 @@ RUN Rscript -e "install.packages(c('sqldf', 'forecast', 'plyr', 'dplyr', 'string
 # Remove unused
 RUN apk del --purge R-dev openssl-dev curl-dev
 RUN apk del --purge autoconf automake libtool
-RUN apk del --purge geos-dev lapack-dev
+RUN apk del --purge geos-dev lapack-dev freetype-dev libpng-dev
 RUN apk del --purge python3-dev
 RUN apk del --purge alpine-sdk libevent-dev bsd-compat-headers git
