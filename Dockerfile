@@ -29,7 +29,8 @@ RUN apk add --no-cache openblas openblas-dev \
   openssl openssl-dev \
   libxml2 libxml2-dev \
   libxslt libxslt-dev \
-  curl curl-dev
+  curl curl-dev \
+  zeromq zeromq-dev
 
 # Install required python packages
 RUN pip3 install --upgrade --no-cache-dir numpy
@@ -54,7 +55,10 @@ RUN pip3 install --upgrade --no-cache-dir https://github.com/statsmodels/statsmo
 RUN apk add --no-cache R R-dev
 
 # Install R kernel
-RUN Rscript -e "install.packages(c('repr', 'pbdZMQ', 'devtools'), repos='http://cran.r-project.org')"
+RUN Rscript -e "install.packages(c('pbdZMQ'), repos='http://cran.r-project.org')"
+RUN Rscript -e "install.packages(c('devtools'), repos='http://cran.r-project.org')"
+RUN Rscript -e "devtools::install_github('IRkernel/repr')"
+RUN Rscript -e "devtools::install_github('IRkernel/IRdisplay')"
 RUN Rscript -e "devtools::install_github('IRkernel/IRkernel')"
 RUN Rscript -e "IRkernel::installspec()"
 
@@ -62,4 +66,4 @@ RUN Rscript -e "IRkernel::installspec()"
 RUN Rscript -e "install.packages(c('sqldf', 'forecast', 'plyr', 'dplyr', 'stringr', 'lubridate', 'ggplot2', 'ggrepel', 'ez', 'scales', 'qcc', 'reshape', 'reshape2', 'randomForest'), repos='http://cran.r-project.org')"
 
 # Remove unused
-RUN apk del --purge R-dev openssl-dev curl-dev autoconf automake libtool geos-dev lapack-dev freetype-dev libpng-dev libffi-dev libxml2-dev libxslt-dev python3-dev alpine-sdk libevent-dev bsd-compat-headers git
+RUN apk del --purge R-dev openssl-dev curl-dev autoconf automake libtool geos-dev lapack-dev freetype-dev libpng-dev libffi-dev libxml2-dev libxslt-dev zeromq-dev python3-dev alpine-sdk libevent-dev bsd-compat-headers git
